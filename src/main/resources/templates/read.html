@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 조회</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <style>
+        table, th, td {
+            border: 1px solid #444;
+            border-collapse: collapse;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>사용자별 게시글 조회</h2>
+
+<div>
+    <label>userId: <input type="number" id="input_userId" /></label>
+    <button onclick="readPosts()">조회</button>
+</div>
+
+<br/>
+
+<table id="postTable">
+    <thead>
+    <tr>
+        <th>postId</th>
+        <th>제목</th>
+        <th>내용</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 결과 표시 영역 -->
+    </tbody>
+</table>
+
+<script>
+    function readPosts() {
+        const userId = $("#input_userId").val();
+
+        if (!userId) {
+            alert("userId를 입력해주세요.");
+            return;
+        }
+
+        $.ajax({
+            url: "/post/read",
+            method: "GET",
+            headers: {
+                "Authorization": localStorage.getItem("Authorization")
+            },
+            data: { userId: userId },  // ✅ DTO와 정확히 일치!
+            success: function(data) {
+                const tbody = $("#postTable tbody");
+                tbody.empty();
+
+                if (data.length === 0) {
+                    tbody.append('<tr><td colspan="3">게시글이 없습니다.</td></tr>');
+                    return;
+                }
+
+                for (const post of data) {
+                    tbody.append(`
+                        <tr>
+                            <td>${post.postId}</td>
+                            <td>${post.title}</td>
+                            <td>${post.content}</td>
+                        </tr>
+                    `);
+                }
+            },
+            error: function(err) {
+                alert("조회 실패: " + JSON.stringify(err));
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

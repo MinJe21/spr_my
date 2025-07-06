@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+
+<h2>게시글 작성</h2>
+
+<div>
+    <label>제목: <input type="text" id="input_title"/></label><br/><br/>
+    <label>내용: <input type="text" id="input_content"/></label><br/><br/>
+
+    <input type="file" id="input_file" onchange="readURLFile(this)"/>
+    <button onclick="uploadFile()">사진 추가</button>
+
+    <div id="div_img_list"></div>
+
+    <br/>
+    <button onclick="createBoard()">작성하기!</button>
+</div>
+
+<script>
+    let tempFile = null;
+
+    function readURLFile(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.readAsDataURL(input.files[0]);
+            reader.onload = function(e) {
+                alert("파일 선택됨: " + input.files[0].name);
+                tempFile = input.files[0];
+            }
+        }
+    }
+
+    function uploadFile() {
+        if (!tempFile) {
+            alert("파일을 먼저 선택해 주세요!");
+            return;
+        }
+
+        const fileData = new FormData();
+        fileData.append("file", tempFile);
+
+        $.ajax({
+            url: "/api/default/uploadFile",
+            type: "POST",
+            data: fileData,
+            contentType: false,
+            processData: false,
+            cache: false,
+            headers: {
+                "Authorization": localStorage.getItem("accessToken")
+            },
+            success: (data) => {
+                alert("업로드 성공: " + data);
+                $("#div_img_list").append(
+                    `<div>
+                        <input type="hidden" class="board_imgs" value="${data}"/>
+                        <img style="height:100px" src="/image/${data}"/>
+                        <button onclick="remove_img(this)">삭제</button>
+                    </div>`
+                );
+                tempFile = null;
+                $("#input_file").val(""); // 초기화
+            },
+            error: () => {
+                alert("업로드 실패");
+            }
+        });
+    }
+
+    function remove_img(button) {
+        $(button).parent().remove();
+    }
+
+    function createBoard() {
+        const accessToken = localStorage.getItem("Authorization");
+        if (!accessToken) {
+            alert("로그인이 필요합니다.");
+            location.href = "/login";
+            return;
+        }
+
+        const title = $("#input_title").val().trim();
+        const content = $("#input_content").val().trim();
+
+        if (!title || !content) {
+            alert("제목과 내용을 입력해 주세요.");
+            return;
+        }
+
+        const imgs = $(".board_imgs").map(function () {
+            return $(this).val();
+        }).get();
+
+        const postData = {
+            title: title,
+            content: content,
+            imgs: imgs
+        };
+
+        $.ajax({
+            url: "/post/create", // ✅ 여기만 변경
+            method: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(postData),
+            headers: {
+                "Authorization": accessToken
+            },
+            success: (data) => {
+                alert("게시글 작성 완료!");
+                location.href = "/";
+            },
+            error: (xhr) => {
+                alert("작성 실패: " + JSON.stringify(xhr.responseJSON || xhr));
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
