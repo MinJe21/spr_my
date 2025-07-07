@@ -113,7 +113,10 @@
             },
             success: (data) => {
                 alert("게시글 작성 완료!");
-                location.href = "/";
+                // 페이지를 이동하지 않고 입력값만 초기화
+                $("#input_title").val("");
+                $("#input_content").val("");
+                $("#div_img_list").empty();
             },
             error: (xhr) => {
                 alert("작성 실패: " + JSON.stringify(xhr.responseJSON || xhr));

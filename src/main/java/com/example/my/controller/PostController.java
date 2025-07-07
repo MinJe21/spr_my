@@ -4,6 +4,7 @@ import com.example.my.dto.PostDto;
 import com.example.my.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,14 +37,14 @@ public class PostController {
         return ResponseEntity.ok(responseDtoList);
     }
 
-    @PutMapping
-    public ResponseEntity<PostDto.UpdateResPost> updatePost(@RequestBody PostDto.UpdateReqPost params, HttpServletRequest request) {
+    @PutMapping("/update")
+    public ResponseEntity<PostDto.UpdateResPost> updatePost(@RequestBody PostDto.UpdateServPost params, HttpServletRequest request) {
         Long reqUserId = getReqUserId(request);
-        params.setUserId(reqUserId);
+        params.setReqUserId(reqUserId);
         System.out.println("요청한 유저 아이디: " + reqUserId);
-        return ResponseEntity.ok(postService.updatePost(params));
+        postService.updatePost(params);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 
 
 }

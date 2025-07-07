@@ -3,6 +3,7 @@ package com.example.my.dto;
 import com.example.my.domain.Post;
 import com.example.my.domain.User;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 public class PostDto {
     @Builder
@@ -16,7 +17,7 @@ public class PostDto {
         private String content;
 
         public Post toEntity(){
-            return Post.of(getUserId(), getTitle(), getContent(), null);
+            return Post.of( getTitle(), getContent(), null);
         }
     }
 
@@ -51,7 +52,7 @@ public class PostDto {
         private String content;
     }
 
-    @Builder
+    @SuperBuilder
     @Getter
     @Setter
     @NoArgsConstructor
@@ -59,6 +60,17 @@ public class PostDto {
     public static class UpdateReqPost {
         private Long userId;
         private Long postId;
+        private String title;
+        private String content;
+    }
+
+    @SuperBuilder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateServPost extends UpdateReqPost{
+        Long reqUserId;
     }
 
     @Builder
@@ -67,6 +79,7 @@ public class PostDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateResPost {
+        private Long postId;
         private String title;
         private String content;
     }

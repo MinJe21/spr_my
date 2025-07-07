@@ -18,6 +18,8 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
     private boolean deleted;
+
+    @Column(nullable = false, unique = true)
     private String username;
     private String password;
 

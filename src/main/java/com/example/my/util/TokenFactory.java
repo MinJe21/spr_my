@@ -61,9 +61,7 @@ public class TokenFactory {
             if(returnData != null){
                 //나는 중복로그인 안할 경우!
                 List<RefreshToken> list =  refreshTokenRepository.findByUserId(id);
-                for(RefreshToken each : list){
-                    refreshTokenRepository.delete(each);
-                }
+                refreshTokenRepository.deleteAll(list);
 
                 //리프레시 토큰 저장!
                 refreshTokenRepository.save(RefreshToken.of(id, duedate, returnData));

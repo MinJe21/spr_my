@@ -15,12 +15,12 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDto.LoginReqDto req) {
-        UserDto.LoginResDto res = userService.Login(req);
-        if (res == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("아이디 또는 비밀번호가 일치하지 않습니다.");
+        try {
+            UserDto.LoginResDto res = userService.Login(req);
+            return ResponseEntity.ok(res);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-        return ResponseEntity.ok(res);
     }
 
     @PostMapping("/signup")

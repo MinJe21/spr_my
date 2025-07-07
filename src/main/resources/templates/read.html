@@ -2,13 +2,16 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>게시글 조회</title>
+    <title>게시글 조회 및 수정</title>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <style>
         table, th, td {
             border: 1px solid #444;
             border-collapse: collapse;
             padding: 8px;
+        }
+        th {
+            background-color: #eee;
         }
     </style>
 </head>
@@ -36,6 +39,15 @@
     </tbody>
 </table>
 
+<br/>
+<h3>게시글 수정</h3>
+<div>
+    <label>postId: <input type="number" id="update_postId" /></label><br/>
+    <label>제목: <input type="text" id="update_title" /></label><br/>
+    <label>내용: <input type="text" id="update_content" /></label><br/>
+    <button onclick="updatePost()">수정</button>
+</div>
+
 <script>
     function readPosts() {
         const userId = $("#input_userId").val();
@@ -51,7 +63,7 @@
             headers: {
                 "Authorization": localStorage.getItem("Authorization")
             },
-            data: { userId: userId },  // ✅ DTO와 정확히 일치!
+            data: { userId: userId },
             success: function(data) {
                 const tbody = $("#postTable tbody");
                 tbody.empty();
@@ -62,17 +74,58 @@
                 }
 
                 for (const post of data) {
-                    tbody.append(`
+                    const row = $(`
                         <tr>
                             <td>${post.postId}</td>
                             <td>${post.title}</td>
                             <td>${post.content}</td>
                         </tr>
                     `);
+
+                    // 행을 클릭하면 수정 입력창에 값 채워주기
+                    row.click(function() {
+                        $("#update_postId").val(post.postId);
+                        $("#update_title").val(post.title);
+                        $("#update_content").val(post.content);
+                    });
+
+                    tbody.append(row);
                 }
             },
             error: function(err) {
                 alert("조회 실패: " + JSON.stringify(err));
+            }
+        });
+    }
+
+    function updatePost() {
+        const postId = $("#update_postId").val();
+        const title = $("#update_title").val();
+        const content = $("#update_content").val();
+
+        if (!postId || !title || !content) {
+            alert("모든 값을 입력해주세요.");
+            return;
+        }
+
+        $.ajax({
+            url: "/post/update",
+            method: "PUT",
+            contentType: "application/json",
+            headers: {
+                "Authorization": localStorage.getItem("Authorization")
+            },
+            data: JSON.stringify({
+                postId: postId,
+                title: title,
+                content: content
+            }),
+            success: function() {
+                alert("게시글이 성공적으로 수정되었습니다!");
+                readPosts();
+            },
+            error: function(err) {
+                alert("수정 실패: " + JSON.stringify(err));
             }
         });
     }

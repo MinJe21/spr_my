@@ -28,7 +28,7 @@ public class Post {
         return new Post(null, title, content, user);
     }
 
-    public static Post of(Long userId, String title, String content, User user) {
-        return new Post(userId, title, content, user);
+    public static Post of(String title, String content, User user) {
+        return new Post(null, title, content, user);
     }
 }

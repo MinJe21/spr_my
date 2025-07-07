@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -16,7 +18,10 @@ public class UserService {
     private final TokenFactory tokenFactory;
 
     public UserDto.CreateResUser CreateUser(UserDto.CreateReqUser req) {
-        User u = new User(null, false, req.getUsername(), req.getPassword());
+        Optional<User> existing = userRepository.findByUsername(req.getUsername());
+        if (existing.isPresent()) {
+            throw new RuntimeException("이미 존재하는 username입니다.");
+        }
         return userRepository.save(req.toEntity()).toCreateResDto();
     }
 
@@ -24,11 +29,8 @@ public class UserService {
     public UserDto.LoginResDto Login(UserDto.LoginReqDto req) {
         User user = userRepository.findByUsernameAndPassword(req.getUsername(), req.getPassword());
         if(user == null){
-            //throw new RuntimeException("id or password error!!");
-            //로그인 실패
             return UserDto.LoginResDto.builder().refreshToken(null).build();
         } else {
-            //로그인 성공
             String refreshToken = tokenFactory.generateRefreshToken(user.getUserId());
             System.out.println("refreshToken : " + refreshToken);
 

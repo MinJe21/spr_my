@@ -47,5 +47,45 @@ public class PostService {
         return dtoList;
     }
 
+    public PostDto.UpdateResPost updatePost(PostDto.UpdateServPost req) {
+        Post post = postRepository.findById(req.getPostId())
+                .orElseThrow(() -> new RuntimeException("post not found"));
 
+        if (!post.getUser().getUserId().equals(req.getReqUserId())) {
+            throw new RuntimeException("not matched userId");
+        }
+
+        post.setTitle(req.getTitle());
+        post.setContent(req.getContent());
+        postRepository.save(post);
+
+        return PostDto.UpdateResPost.builder()
+                .postId(post.getPostId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .build();
+    }
+
+
+//    public void updatePost(PostDto.UpdateServPost req) {
+//        Post post = postRepository.findById(req.getReqUserId()).orElse(null);
+//        Long reqUserId = req.getReqUserId();
+//        if(post == null) {
+//            throw new RuntimeException("no post");
+//        }
+//        if(post.getPostId() == null) {
+//            throw new RuntimeException("not login");
+//        }
+//        if(!reqUserId.equals(post.getUser().getUserId())) {
+//            throw new RuntimeException("not matched userId");
+//        }
+//
+//        if(post.getTitle() == null) {
+//            post.setTitle(req.getTitle());
+//        }
+//        if(post.getContent() == null) {
+//            post.setContent(req.getContent());
+//        }
+//        postRepository.save(post);
+//    }
 }
