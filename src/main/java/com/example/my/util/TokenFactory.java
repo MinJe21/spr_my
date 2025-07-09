@@ -1,6 +1,7 @@
 package com.example.my.util;
 
 import com.example.my.domain.RefreshToken;
+import com.example.my.exception.InvalidTokenException;
 import com.example.my.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,8 @@ public class TokenFactory {
         return generate(id, "refreshToken");
     }
     public Long validateRefreshToken(String key){
-        RefreshToken refreshToken = refreshTokenRepository.findByContent(key);
+        RefreshToken refreshToken = refreshTokenRepository.findByContent(key)
+                .orElseThrow(() -> new InvalidTokenException(""));
         Long userId = validate(key);
         if(userId != null && userId > 0){
             if(userId.equals(refreshToken.getUserId())){

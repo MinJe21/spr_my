@@ -19,18 +19,14 @@ public class RefreshToken {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String duedate;
 
     @Column(unique = true, nullable = false, length = 512)
     private String content;
 
     public static RefreshToken of(Long userId, String duedate, String content) {
-        return RefreshToken.builder()
-                .userId(userId)
-                .duedate(duedate)
-                .content(content)
-                .build();
+        return new  RefreshToken(null, userId, duedate, content);
     }
 
 }

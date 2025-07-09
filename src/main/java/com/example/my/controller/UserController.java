@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDto.LoginReqDto req) {
-        try {
-            UserDto.LoginResDto res = userService.Login(req);
-            return ResponseEntity.ok(res);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<?> login(@RequestBody UserDto.LoginReqDto req) {
+//        try {
+//            UserDto.LoginResDto res = userService.Login(req);
+//            return ResponseEntity.ok(res);
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+//        }
+//    }
 
     @PostMapping("/signup")
     public ResponseEntity<UserDto.CreateResUser> signup(@RequestBody UserDto.CreateReqUser req) {

@@ -1,10 +1,7 @@
 package com.example.my.dto;
 
 import com.example.my.domain.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class UserDto {
 
@@ -27,6 +24,7 @@ public class UserDto {
 
     @Builder
     @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateReqUser{

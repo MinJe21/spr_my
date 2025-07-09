@@ -1,5 +1,8 @@
 package com.example.my.controller;
 
+import com.example.my.exception.InvalidTokenException;
+import com.example.my.security.AuthService;
+import com.example.my.security.ExternalProperties;
 import com.example.my.util.TokenFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -14,20 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthRestController {
 
-    private final TokenFactory tokenFactory;
+    //private final TokenFactory tokenFactory;
+    //private final String prefix = "Bearer ";
 
-    private final String prefix = "Bearer ";
+    final ExternalProperties externalProperties;
+    final AuthService authService;
 
     @PostMapping("")
     public ResponseEntity<Void> access(HttpServletRequest request){
-        String returnValue = null;
-        String refreshToken = request.getHeader("RefreshToken");
-        if(refreshToken.startsWith(prefix)){
-            refreshToken = refreshToken.substring(prefix.length());
-            String accessToken = tokenFactory.generateAccessToken(refreshToken);
-            returnValue = prefix + accessToken;
+        String accessToken = null;
+        String prefix = externalProperties.getTokenPrefix();
+        String refreshToken = request.getHeader(externalProperties.getRefreshKey());
+        if(refreshToken == null || !refreshToken.startsWith(prefix)){
+            throw new InvalidTokenException("no prefix");
         }
-        return ResponseEntity.status(HttpStatus.OK).header("Authorization", returnValue).build();
+        refreshToken = refreshToken.substring(prefix.length());
+        accessToken = authService.issueAccessToken(refreshToken);
+        return ResponseEntity.status(HttpStatus.OK).header(externalProperties.getAccessKey(), prefix + accessToken).build();
     }
 
 }
